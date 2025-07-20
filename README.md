@@ -23,10 +23,87 @@ The ultrasonic sensor scans the surroundings using a servo motor. If an obstacle
 
 # Project Structure
 
-## 📷 Gallery
-| Front View | Top View |
-|------------|----------|
-| ![Front](Images/front_view.jpg) | ![Top](Images/top_view.jpg) |
+## Gallery
+<img width="625" height="728" alt="image" src="https://github.com/user-attachments/assets/fe5860a0-d16e-42e9-abf9-4796823264f4" />
+<img width="269" height="360" alt="image" src="https://github.com/user-attachments/assets/9bf1b143-a50c-41c7-8b14-7c5ee304989c" />
+
+
+
+# Code 
+#include <Servo.h>
+#include <AFMotor.h>
+
+// Pin definitions
+#define Echo A0
+#define Trig A1
+#define ServoPin 10
+#define Speed 170
+#define ServoCenter 103
+
+// Motor setup
+AF_DCMotor M1(1);
+AF_DCMotor M2(2);
+AF_DCMotor M3(3);
+AF_DCMotor M4(4);
+
+// Global variables
+Servo servo;
+char value;
+int distance, Left, Right;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(Trig, OUTPUT);
+  pinMode(Echo, INPUT);
+  servo.attach(ServoPin);
+
+  M1.setSpeed(Speed);
+  M2.setSpeed(Speed);
+  M3.setSpeed(Speed);
+  M4.setSpeed(Speed);
+}
+
+void loop() {
+  // Uncomment one of the following as needed
+  ObstacleAvoidance();
+  // BluetoothControl();
+  // VoiceControl();
+}
+
+// --- Obstacle Avoidance Logic ---
+void ObstacleAvoidance() {
+  distance = ultrasonic();
+
+  if (distance <= 25) {
+    Stop();
+    backward();
+    delay(100);
+    Stop();
+
+    Left = scanLeft();
+    Right = scanRight();
+
+    servo.write(ServoCenter);
+    delay(800);
+
+    if (Left > Right) {
+      left();
+    } else {
+      right();
+    }
+    delay(500);
+    Stop();
+  } else {
+    forward();
+  }
+}
+
+// --- Bluetooth Control ---
+void BluetoothControl() {
+  if (Serial.available() > 0) {
+    value = Serial.read();
+    Serial.println(value);
+  }
 
 
 # Testing Summary
